@@ -24,6 +24,39 @@ I would say we start with the presentation:
 
 Backup slide: the feature list and tuning grid, in case someone asks.
 
+## Final features and numbers (full run of the notebook on main, after PR #9)
+
+**Features used (25 in total)**
+- Client table (3): `client_catg`, `region`, `creation_date`
+- Raw invoice columns, averaged per client (11): `counter_statue`, `counter_code`, `reading_remarque`, `counter_coefficient`, `consommation_level_1` to `_4`, `old_index`, `months_number`, `counter_type`
+- Engineered features (11): `mean_diff_index`, `n_tarif_types`, `n_counters`, `n_invoices`, `cons_mean`, `cons_std`, `cons_min`, `cons_zero_share`, `n_negative_diff`, `share_negative_diff`, `cons_change`
+- Left out: `tarif_type` (99.6% correlated with `counter_type`), `new_index` (99.3% with `old_index`), `disrict` (coarser than `region`). We also tried dropping `counter_code` and `counter_statue`, but about 800 more honest clients were wrongly flagged, so they stay.
+
+**Data (slides 2 and 3):** 135,493 clients, 4,476,749 invoices, median 30 invoices per client. Fraud rate 5.58%. Always predicting "no fraud" is 94.4% accurate. Test set: 1,892 fraud and 31,982 honest clients.
+
+**Score ladder (slides 4, 5, 7):** AUC on the same client split.
+
+| Model | Train AUC | Test AUC |
+|---|---|---|
+| 1. Baseline (raw data, default settings) | 0.8716 | 0.7962 |
+| 2. Baseline + tuned settings (36 combinations) | 0.8708 | 0.7966 |
+| 3. Engineered features, default settings | 0.9160 | 0.8726 |
+| 4. Engineered features + tuned settings | 0.9174 | 0.8718 |
+
+Tuning moves the score by 0.0004. Feature engineering adds about 0.076 test AUC. Train is higher than test by about 0.05 for the engineered models and 0.075 for the baseline, so there is some overfitting but no collapse.
+
+**Inspections (slide 8):** same final model, three ways to flag clients, test set.
+
+| Setup | Fraud caught | Recall | Precision | Honest wrongly flagged |
+|---|---|---|---|---|
+| Model 4, cut-off 0.5 | 179 | 9.5% | 58.9% | 125 |
+| + fraud weighting, cut-off 0.5 | 1,441 | 76.2% | 19.3% | 6,030 |
+| + weighting, cut-off 0.547 (chosen, target 70% recall) | 1,369 | 72.4% | 21.2% | 5,080 |
+
+About 1 in 5 inspections finds fraud, against 1 in 18 at random (5.58%).
+
+Caveats: each number is from a single run, so differences of a few dozen fraud clients caught are within run-to-run noise. The per-feature-group ablation is still not done, so the "which feature helped" split is not available yet. Earlier numbers from before the column drops (1,381 caught, 5,158 wrongly flagged) were close to these.
+
 Gaps to fill before building slides
 - [LATER]The beautified Marina notebook has no saved outputs, so there are no baseline or final numbers anywhere yet. Slides 4, 5 and 8 need a full run, and FAST_MODE is currently True, which only gives a quick sanity check. I'd run it with FAST_MODE = False.
 - [NOW] Slide 8 needs the feature groups scored separately. The notebook doesn't do that yet, so it needs an ablation loop (add each group alone, then all together), about 15 minutes of work.
