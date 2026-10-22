@@ -11,15 +11,20 @@ I would say we start with the presentation:
 4. **Baseline**. The LGBM from the challenge description based on just the existing data without feature engineering, plus its score. This is the number to beat.
 5. **Attempt 1: tuning the settings**. A grid of 36 combinations, and little improvement. This justifies moving on.
 6. **Attempt 2: feature engineering to maximise fraud detection.** 
-	1. What we found out - remarque column is indicative of fraud (value assigned during the meter reading)
-	2. Fraudsters tamper with meters, so what matters is change in behaviour (index going backwards, consumption dropping, a switch of tariff), not static values. One slide, plain language, and mention that this came from team discussion plus Claude.
-7. The new features. Three groups from the notebook: consumption pattern, negative index differences, and consumption drop between earlier and later invoices. Add one example chart: fraud versus non-fraud on the strongest feature.
-8. Results: the KPI ladder. One bar chart: baseline → tuned → plus each feature group → final. This is your "which feature actually helped" slide, and it keeps the story consistent. I'd show each group added separately and then combined.
-9. Recommendations, data product, and next steps. Use the confusion matrix to explain the trade-off: inspections caught versus customers wrongly flagged. The data product is a ranked weekly inspection list. Future work: more data, other algorithms, threshold tuning.
+	1. What we found out - 
+		1. remarque column is indicative of fraud (value assigned during the meter reading) -> @Peter to add the section with the table to the notebook
+		2. Fraudsters tamper with meters, so what matters is **change in behaviour** not static values.
+			1. a switch of tariff (and how many times it happened, showing the consumption pattern)
+			2. index going backwards (when new index measurement is lower than the old one)
+			3.  consumption drop between earlier and later invoices
+	2. Correlation matrix across all features + decision to drop unnecessary features
+	3. Slide structure - feature, explanation + code snippet + visualisation (table with quick heuristic of fraud rate by feature group e.g. share fraudsters by number of tariff switches)
+7. **Results:** the KPI ladder. One bar chart: baseline → tuned → plus each feature group → final. This is your "which feature actually helped" slide, and it keeps the story consistent. I'd show each group added separately and then combined. We need to show both training and the test results to see if we overfitted or under-fitted. Explain the AUC metric improvement from the baseline and what it means.
+8. **Recommendations**, data product, and next steps. Use the confusion matrix to explain the trade-off: inspections caught versus customers wrongly flagged. The data product is a ranked weekly inspection list. Future work: more data, other algorithms, threshold tuning.
 
 Backup slide: the feature list and tuning grid, in case someone asks.
 
 Gaps to fill before building slides
-- The beautified Marina notebook has no saved outputs, so there are no baseline or final numbers anywhere yet. Slides 4, 5 and 8 need a full run, and FAST_MODE is currently True, which only gives a quick sanity check. I'd run it with FAST_MODE = False.
-- Slide 8 needs the feature groups scored separately. The notebook doesn't do that yet, so it needs an ablation loop (add each group alone, then all together), about 15 minutes of work.
-- Your outline calls the baseline "LGBM as in the challenge". The notebook has no untuned baseline cell, so that needs adding as well.
+- [LATER]The beautified Marina notebook has no saved outputs, so there are no baseline or final numbers anywhere yet. Slides 4, 5 and 8 need a full run, and FAST_MODE is currently True, which only gives a quick sanity check. I'd run it with FAST_MODE = False.
+- [NOW] Slide 8 needs the feature groups scored separately. The notebook doesn't do that yet, so it needs an ablation loop (add each group alone, then all together), about 15 minutes of work.
+- [NOW] Your outline calls the baseline "LGBM as in the challenge". The notebook has no untuned baseline cell, so that needs adding as well.
