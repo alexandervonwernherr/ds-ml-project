@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "ask": [
+      "Bash(jupyter nbconvert*)",
+      "Bash(jupyter execute*)",
+      "Bash(papermill*)",
+      "Bash(docker run*)",
+      "Bash(docker compose run*)",
+      "Bash(docker-compose run*)",
+      "Bash(docker compose up*)",
+      "Bash(uv run*)"
+    ]
+  }
+}
